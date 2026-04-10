@@ -105,4 +105,4 @@ bad_command_str db 'Unrecognized command. Execute HELP for help.', 13, 10, 0
 cmd_help db 'HELP', 0
 help_msg db 'ECHO66 shell interface. Version 0.0', 13, 10, 'Common commands:', 13, 10, 'HELP - This help page.', 13, 10, 'More coming later...', 13, 10, 0
 
-command_buffer times 64 db 0
+command_buffer rb 64
