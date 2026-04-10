@@ -39,16 +39,29 @@ input_loop:
  mov ah, 0x00
  int 0x16
  cmp al, 13
- jne .print_input
+ je .newline
+ cmp al, 8
+ je .backspace
  mov ah, 0x09
  mov bl, 0x0F
+ int 0x10
+ jmp input_loop
+.newline:
+ mov ah, 0x09
+ mov bl, 0x0F
+ mov al, 13
  int 0x10
  mov al, 10
  int 0x10
  jmp shell_prompt
-.print_input:
+.backspace:
  mov ah, 0x09
  mov bl, 0x0F
+ mov al, 8
+ int 0x10
+ mov al, 32
+ int 0x10
+ mov al, 32
  int 0x10
  jmp input_loop
 
