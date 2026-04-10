@@ -14,7 +14,8 @@ start:
 
 ; WELCOME
 welcome:
- mov ah, 0x0E
+ mov ah, 0x09
+ mob bl, 0x0B
  mov si, welcome_str
 .print_welcome:
  lodsb
@@ -25,7 +26,8 @@ welcome:
 
 ; SHELL
 shell_prompt:
- mov ah, 0x0E
+ mov ah, 0x09
+ mov bl, 0x0A
  mov si, prompt
 .print_shell:
  lodsb
@@ -38,13 +40,15 @@ input_loop:
  int 0x16
  cmp al, 13
  jne .print_input
- mov ah, 0x0E
+ mov ah, 0x09
+ mov bl, 0x0F
  int 0x10
  mov al, 10
  int 0x10
  jmp shell_prompt
 .print_input:
- mov ah, 0x0E
+ mov ah, 0x09
+ mov bl, 0x0F
  int 0x10
  jmp input_loop
 
