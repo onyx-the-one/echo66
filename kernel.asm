@@ -14,26 +14,14 @@ start:
 
 ; WELCOME
 welcome:
- mov ah, 0x0E
  mov si, welcome_str
-.print_welcome:
- lodsb
- cmp al, 0
- je shell_prompt
- int 0x10
- jmp .print_welcome
+ call print_tt
 
 ; SHELL
 shell_prompt:
- mov ah, 0x0E
  mov di, command_buffer
  mov si, prompt
-.print_shell:
- lodsb
- cmp al, 0
- je input_loop
- int 0x10
- jmp .print_shell
+ call print_tt
 input_loop:
  mov ah, 0x00
  int 0x16
@@ -67,42 +55,75 @@ input_loop:
  dec di
  jmp input_loop
 check_commands:
- mov si, cmd_help
  mov di, command_buffer
+ mov si, cmd_help
+ call strcmp
+ jc .help
+ mov si, cmd_clear
+ call strcmp
+ jc .clear
+ mov si, cmd_reboot
+ call strcmp
+ jc .reboot
+ jmp .bad_command
+
+; COMMANDS
+.bad_command:
+ mov si, bad_command_str
+ call print_tt
+ jmp shell_prompt
+.help:
+ mov si, help_msg
+ call print_tt
+ jmp shell_prompt
+.clear:
+ mov ah, 0x00
+ mov al, 0x03
+ int 0x10
+ jmp shell_prompt
+.reboot:
+ jmp 0xFFFF:0x0000
+
+; FUNCTIONS
+print_tt:
+ mov ah, 0x0E
+.loop:
+ lodsb
+ cmp al, 0
+ je .done
+ int 0x10
+ jmp .loop
+.done:
+ ret
+strcmp:
+ push si
+ push di
 .compare_loop:
  lodsb
  mov bl, [di]
  inc di
  cmp al, bl
- jne .bad_command
+ jne .nomatch
  cmp al, 0
- je .help
- jmp .compare_loop
-.bad_command:
- mov ah, 0x0E
- mov si, bad_command_str
-.print_bad_command:
- lodsb
- cmp al, 0
- je shell_prompt
- int 0x10
- jmp .print_bad_command
-.help:
- mov ah, 0x0E
- mov si, help_msg
-.print_help:
- lodsb
- cmp al, 0
- je shell_prompt
- int 0x10
- jmp .print_help
+ jne .compare_loop
+ stc
+ pop di
+ pop si
+ ret
+.nomatch:
+ clc
+ pop di
+ pop si
+ ret
 
 ; DATA
 welcome_str db 'Welcome to Ring 0 of ECHO66', 13, 10, 0
 prompt db 'OS> ', 0
 bad_command_str db 'Unrecognized command. Execute HELP for help.', 13, 10, 0
+help_msg db 'ECHO66 shell interface. Version 0.0', 13, 10, 'Common commands:', 13, 10, 'HELP - This help page.', 13, 10, 'CLEAR - Clear the screen.', 13, 10, 'REBOOT - Reboot the computer.', 13, 10, 0
 
 cmd_help db 'HELP', 0
-help_msg db 'ECHO66 shell interface. Version 0.0', 13, 10, 'Common commands:', 13, 10, 'HELP - This help page.', 13, 10, 'More coming later...', 13, 10, 0
+cmd_clear db 'CLEAR', 0
+cmd_reboot db 'REBOOT', 0
 
 command_buffer rb 64
