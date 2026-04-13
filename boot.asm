@@ -41,7 +41,7 @@ main:
  mov [boot_drive], dl
  mov bx, 0x8000
  mov ah, 0x02
- mov al, 1
+ mov al, 5
  mov ch, 0
  mov dh, 0
  mov cl, 2
