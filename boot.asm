@@ -4,31 +4,30 @@ org 0x7C00
 
 ; BTB FAT12
 ; JUMP SEQUENCE
-start:
- jmp main
- nop
+jmp short start
+nop
 ; DISK SETUP
-oem_name db 'ECHO66  '
-bytes_per_setup dw 512
-sectors_per_cluster db 1
-reserved_sectors dw 1
-fat_copies db 2
-root_dir_entries dw 224
-total_sectors dw 2880
-media_descriptor db 0xF0
-sectors_per_fat dw 9
-sectors_per_track dw 18
-heads_per_cylinder dw 2
-hidden_sectors dd 0
-total_sectors_large dd 0
-drive_number db 0
-reserved db 0
-extended_signature db 0x29
-volume_serial_id dd 0x01230123
-volume_label db 'ECHO66BOOTL'
-file_system_type db 'FAT12   '
+OEMLabel            db "ECHO66  "
+BytesPerSector      dw 512
+SectorsPerCluster   db 1
+ReservedSectors     dw 1
+NumberOfFATs        db 2
+RootEntries         dw 224
+TotalSectors        dw 2880
+Media               db 0xF0
+SectorsPerFAT       dw 9
+SectorsPerTrack     dw 18
+HeadsPerCylinder    dw 2
+HiddenSectors       dd 0
+LargeSectors        dd 0
+DriveNumber         db 0
+Flags               db 0
+Signature           db 0x29
+VolumeID            dd 0xFFFFFFFF
+VolumeLabel         db "ECHO66BOOTL"
+SystemID            db "FAT12   "
 
-main:
+start:
  ; STACK
  cli
  mov ax, 0
@@ -41,9 +40,9 @@ main:
  mov [boot_drive], dl
  mov bx, 0x8000
  mov ah, 0x02
- mov al, 5
+ mov al, 1
  mov ch, 0
- mov dh, 0
+ mov dh, 1
  mov cl, 2
  int 0x13
  jc error
